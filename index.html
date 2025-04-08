@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophy and Logic Exam</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .exam-info {
+            background-color: #eaf2f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .question {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .results {
+            display: none;
+            background-color: #e8f8f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .feedback {
+            margin-top: 20px;
+        }
+        .correct {
+            color: #27ae60;
+        }
+        .incorrect {
+            color: #e74c3c;
+        }
+        .question-result {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .correct-answer {
+            background-color: #e8f8f5;
+            border-left: 4px solid #27ae60;
+        }
+        .wrong-answer {
+            background-color: #fdedec;
+            border-left: 4px solid #e74c3c;
+        }
+        .timer {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+        .instant-feedback {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            display: none;
+        }
+        .instant-correct {
+            background-color: #d5f5e3;
+            color: #27ae60;
+        }
+        .instant-incorrect {
+            background-color: #fadbd8;
+            color: #e74c3c;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .progress {
+            height: 20px;
+            background-color: #3498db;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <h1>Philosophy and Logic Exam</h1>
+    
+    <div class="exam-info">
+        <p><strong>Instructions:</strong> This exam consists of 40 multiple-choice questions covering philosophy and logic. Select the best answer for each question. You'll see immediate feedback after selecting an option. You have 60 minutes to complete the exam.</p>
+    </div>
+    
+    <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+    </div>
+    
+    <div class="timer">Time remaining: <span id="time">60:00</span></div>
+    
+    <form id="exam-form">
+        <!-- Questions will be inserted here by JavaScript -->
+    </form>
+    
+    <button id="submit-btn">Submit Exam</button>
+    
+    <div id="results" class="results">
+        <div class="score">Your score: <span id="score-display">0</span>/40</div>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <script>
+        // Questions data
+        const questions = [
+            {
+                question: "1. Which philosopher is known for the allegory of the cave?",
+                options: ["Aristotle", "Plato", "Descartes", "Kant"],
+                answer: 1
+            },
+            {
+                question: "2. In symbolic logic, what does the '→' symbol represent?",
+                options: ["Conjunction", "Disjunction", "Material implication", "Biconditional"],
+                answer: 2
+            },
+            {
+                question: "3. What is the term for a logical fallacy where one assumes that because something is natural, it is therefore good?",
+                options: ["Appeal to nature", "False dilemma", "Straw man", "Hasty generalization"],
+                answer: 0
+            },
+            {
+                question: "4. Which of these is NOT one of Kant's categorical imperatives?",
+                options: ["Act only according to maxims that can be universalized", "Treat humanity always as an end and never as a means", "Act as if you were legislating for a kingdom of ends", "The greatest happiness for the greatest number"],
+                answer: 3
+            },
+            {
+                question: "5. In predicate logic, what is the universal quantifier?",
+                options: ["∃", "∀", "∈", "∴"],
+                answer: 1
+            },
+            {
+                question: "6. Which philosophical school emphasizes 'the greatest happiness for the greatest number'?",
+                options: ["Deontology", "Utilitarianism", "Virtue ethics", "Existentialism"],
+                answer: 1
+            },
+            {
+                question: "7. What is the name of the paradox that questions whether a heap of sand remains a heap if grains are removed one by one?",
+                options: ["Zeno's paradox", "Sorites paradox", "Russell's paradox", "Theseus' paradox"],
+                answer: 1
+            },
+            {
+                question: "8. Which philosopher wrote 'Thus Spoke Zarathustra'?",
+                options: ["Sartre", "Nietzsche", "Heidegger", "Hegel"],
+                answer: 1
+            },
+            {
+                question: "9. In logic, what is the term for the proposition that a syllogism seeks to establish?",
+                options: ["Premise", "Conclusion", "Enthymeme", "Antecedent"],
+                answer: 1
+            },
+            {
+                question: "10. Which of these is NOT a valid form of syllogism?",
+                options: ["Modus ponens", "Modus tollens", "Affirming the consequent", "Hypothetical syllogism"],
+                answer: 2
+            },
+            {
+                question: "11. What is the name of Descartes' famous philosophical statement?",
+                options: ["I think, therefore I am", "To be is to be perceived", "The unexamined life is not worth living", "God is dead"],
+                answer: 0
+            },
+            {
+                question: "12. Which branch of philosophy deals with the nature of beauty and art?",
+                options: ["Epistemology", "Aesthetics", "Metaphysics", "Ethics"],
+                answer: 1
+            },
+            {
+                question: "13. In modal logic, what does '□p' mean?",
+                options: ["Possibly p", "Necessarily p", "Not p", "p or not p"],
+                answer: 1
+            },
+            {
+                question: "14. Which philosopher is associated with the concept of 'the Other'?",
+                options: ["Beauvoir", "Foucault", "Derrida", "Levinas"],
+                answer: 3
+            },
+            {
+                question: "15. What is the term for a statement that is always true in logic?",
+                options: ["Contingent", "Tautology", "Contradiction", "Consistent"],
+                answer: 1
+            },
+            {
+                question: "16. Which ancient Greek philosopher founded the Lyceum?",
+                options: ["Plato", "Aristotle", "Socrates", "Pythagoras"],
+                answer: 1
+            },
+            {
+                question: "17. In logic, what is the term for replacing a term with another that has the same referent without changing truth value?",
+                options: ["Substitution salva veritate", "Modus operandi", "A priori", "A fortiori"],
+                answer: 0
+            },
+            {
+                question: "18. Which philosopher proposed the 'veil of ignorance' thought experiment?",
+                options: ["Rawls", "Nozick", "Locke", "Hobbes"],
+                answer: 0
+            },
+            {
+                question: "19. What is the name of the fallacy that assumes what it's trying to prove?",
+                options: ["Begging the question", "Circular reasoning", "Both A and B", "Neither A nor B"],
+                answer: 2
+            },
+            {
+                question: "20. Which medieval philosopher developed the ontological argument for God's existence?",
+                options: ["Aquinas", "Augustine", "Anselm", "Ockham"],
+                answer: 2
+            },
+            {
+                question: "21. In logic, what is the term for an argument where the premises make the conclusion probable?",
+                options: ["Deductive", "Inductive", "Abductive", "Reductive"],
+                answer: 1
+            },
+            {
+                question: "22. Which philosopher is associated with the concept of 'dasein'?",
+                options: ["Husserl", "Heidegger", "Sartre", "Merleau-Ponty"],
+                answer: 1
+            },
+            {
+                question: "23. What is the term for the view that all knowledge comes from experience?",
+                options: ["Rationalism", "Empiricism", "Idealism", "Pragmatism"],
+                answer: 1
+            },
+            {
+                question: "24. Which logical operator has the highest precedence?",
+                options: ["∧ (AND)", "∨ (OR)", "¬ (NOT)", "→ (IMPLIES)"],
+                answer: 2
+            },
+            {
+                question: "25. What is the name of the problem that questions how mental states can cause physical states and vice versa?",
+                options: ["The hard problem of consciousness", "The mind-body problem", "The problem of other minds", "The binding problem"],
+                answer: 1
+            },
+            {
+                question: "26. Which philosopher wrote 'The Phenomenology of Spirit'?",
+                options: ["Kant", "Hegel", "Fichte", "Schelling"],
+                answer: 1
+            },
+            {
+                question: "27. In logic, what is the term for a statement that is always false?",
+                options: ["Tautology", "Contradiction", "Contingent", "Valid"],
+                answer: 1
+            },
+            {
+                question: "28. Which philosopher is known for the 'cogito ergo sum' argument?",
+                options: ["Kant", "Hume", "Descartes", "Spinoza"],
+                answer: 2
+            },
+            {
+                question: "29. What is the term for the study of valid inference?",
+                options: ["Epistemology", "Logic", "Semiotics", "Hermeneutics"],
+                answer: 1
+            },
+            {
+                question: "30. Which of these is NOT a type of ethical theory?",
+                options: ["Deontological", "Utilitarian", "Virtue", "Phenomenological"],
+                answer: 3
+            },
+            {
+                question: "31. In propositional logic, what is the term for when two statements have the same truth value in every scenario?",
+                options: ["Consistent", "Logically equivalent", "Tautologous", "Contradictory"],
+                answer: 1
+            },
+            {
+                question: "32. Which philosopher is associated with the concept of 'the will to power'?",
+                options: ["Schopenhauer", "Nietzsche", "Kierkegaard", "Marx"],
+                answer: 1
+            },
+            {
+                question: "33. What is the term for the philosophical study of being?",
+                options: ["Epistemology", "Ontology", "Axiology", "Teleology"],
+                answer: 1
+            },
+            {
+                question: "34. Which logical fallacy involves attacking a person rather than their argument?",
+                options: ["Straw man", "Ad hominem", "False dilemma", "Slippery slope"],
+                answer: 1
+            },
+            {
+                question: "35. Which philosopher developed the theory of forms?",
+                options: ["Aristotle", "Plato", "Socrates", "Parmenides"],
+                answer: 1
+            },
+            {
+                question: "36. In logic, what is the term for an argument where the conclusion must be true if the premises are true?",
+                options: ["Sound", "Valid", "Strong", "Cogent"],
+                answer: 1
+            },
+            {
+                question: "37. Which philosopher wrote 'Being and Time'?",
+                options: ["Husserl", "Heidegger", "Sartre", "Merleau-Ponty"],
+                answer: 1
+            },
+            {
+                question: "38. What is the term for the view that abstract concepts have real existence?",
+                options: ["Nominalism", "Realism", "Idealism", "Pragmatism"],
+                answer: 1
+            },
+            {
+                question: "39. Which logical fallacy involves assuming that because event B followed event A, A must have caused B?",
+                options: ["False cause", "Hasty generalization", "Begging the question", "Appeal to authority"],
+                answer: 0
+            },
+            {
+                question: "40. Which philosopher is known for the 'state of nature' concept and the social contract theory?",
+                options: ["Locke", "Hobbes", "Rousseau", "All of the above"],
+                answer: 3
+            }
+        ];
+
+        // Initialize the exam
+        const examForm = document.getElementById('exam-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const resultsDiv = document.getElementById('results');
+        const scoreDisplay = document.getElementById('score-display');
+        const feedbackDiv = document.getElementById('feedback');
+        const timeDisplay = document.getElementById('time');
+        const progressBar = document.getElementById('progress');
+
+        // Timer variables
+        let timeLeft = 60 * 60; // 60 minutes in seconds
+        let timer;
+        let answeredCount = 0;
+
+        // Start the timer
+        function startTimer() {
+            timer = setInterval(function() {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timeDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (answeredCount / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Create the exam questions
+        function createExam() {
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.id = `question-${index}`;
+                
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = q.question;
+                questionDiv.appendChild(questionText);
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                q.options.forEach((option, i) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option';
+                    
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = `q${index}`;
+                    radio.value = i;
+                    radio.id = `q${index}o${i}`;
+                    
+                    // Add event listener for instant feedback
+                    radio.addEventListener('change', function() {
+                        showInstantFeedback(index, i);
+                    });
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `q${index}o${i}`;
+                    label.textContent = option;
+                    
+                    optionDiv.appendChild(radio);
+                    optionDiv.appendChild(label);
+                    optionsDiv.appendChild(optionDiv);
+                });
+                
+                // Add instant feedback div
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.className = 'instant-feedback';
+                feedbackDiv.id = `feedback-${index}`;
+                
+                questionDiv.appendChild(optionsDiv);
+                questionDiv.appendChild(feedbackDiv);
+                examForm.appendChild(questionDiv);
+            });
+        }
+
+        // Show instant feedback when an option is selected
+        function showInstantFeedback(questionIndex, selectedOptionIndex) {
+            const feedbackDiv = document.getElementById(`feedback-${questionIndex}`);
+            const question = questions[questionIndex];
+            
+            if (selectedOptionIndex == question.answer) {
+                feedbackDiv.textContent = "Correct!";
+                feedbackDiv.className = "instant-feedback instant-correct";
+            } else {
+                feedbackDiv.textContent = `Incorrect. The correct answer is: ${question.options[question.answer]}`;
+                feedbackDiv.className = "instant-feedback instant-incorrect";
+            }
+            
+            feedbackDiv.style.display = 'block';
+            
+            // Update answered count and progress
+            if (!question.answered) {
+                question.answered = true;
+                answeredCount++;
+                updateProgress();
+            }
+        }
+
+        // Submit the exam
+        function submitExam() {
+            clearInterval(timer);
+            
+            let score = 0;
+            feedbackDiv.innerHTML = '';
+            
+            questions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                const questionResult = document.createElement('div');
+                questionResult.className = 'question-result';
+                
+                if (selectedOption) {
+                    const userAnswer = parseInt(selectedOption.value);
+                    
+                    if (userAnswer === q.answer) {
+                        score++;
+                        questionResult.innerHTML = `<span class="correct">✓ Correct</span>: ${q.question}<br>Your answer: ${q.options[userAnswer]}`;
+                        questionResult.classList.add('correct-answer');
+                    } else {
+                        questionResult.innerHTML = `<span class="incorrect">✗ Incorrect</span>: ${q.question}<br>Your answer: ${q.options[userAnswer]}<br>Correct answer: ${q.options[q.answer]}`;
+                        questionResult.classList.add('wrong-answer');
+                    }
+                } else {
+                    questionResult.innerHTML = `<span class="incorrect">✗ Unanswered</span>: ${q.question}<br>Correct answer: ${q.options[q.answer]}`;
+                    questionResult.classList.add('wrong-answer');
+                }
+                
+                feedbackDiv.appendChild(questionResult);
+            });
+            
+            scoreDisplay.textContent = score;
+            resultsDiv.style.display = 'block';
+            submitBtn.style.display = 'none';
+            
+            // Scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Event listener for submit button
+        submitBtn.addEventListener('click', submitExam);
+
+        // Initialize the exam when the page loads
+        window.addEventListener('load', function() {
+            createExam();
+            updateTimerDisplay();
+            startTimer();
+        });
+    </script>
+</body>
+</html>
